@@ -9,8 +9,13 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request)
+    public function login(Request $request)
     {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string'
+        ]);
+
         $user = User::firstWhere('email', $request['email']);
 
         if ($user && Hash::check($request['password'], $user->password)) 
@@ -23,7 +28,7 @@ class AuthController extends Controller
         } 
         else {
             return response()->streamJson([
-                'message' => 'failed'
+                'message' => 'Email or password is invalid'
             ], 400);
         }
     }
